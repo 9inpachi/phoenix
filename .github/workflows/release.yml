@@ -33,15 +33,22 @@ jobs:
       - name: Deploy Phoenix
         run: npm run deploy
       - name: Generate API docs
-        run: npm run gen-api-docs
+        run: |
+          npm install -g @compodoc/compodoc
+          npm run gen-api-docs
       
       ## Commit and push changes to tag for release
-      - name: Commit the newly added files
+      - name: Commit the newly added files to tag ${{ env.RELEASE_VERSION }}
         uses: EndBug/add-and-commit@v4
         with:
           message: Release phoenix-${{ env.RELEASE_VERSION }}
           tag: ${{ env.RELEASE_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Push commited changes
         uses: ad-m/github-push-action@master
         with:
+          branch: ''
+          tags: true
+          force: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
