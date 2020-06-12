@@ -1,0 +1,46 @@
+#
+#   This workflow deploys Phoenix to web by
+#   - building the angular app
+#   - generating the API docs
+#   - pushing the changes to master branch
+#
+
+on:
+  push:
+    branches:
+      - master
+name: Deploy Phoenix
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      ## Set up
+      - uses: actions/checkout@master
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Set up node
+        uses: actions/setup-node@v1
+
+      ## Deploy and generate API docs
+      - name: Install required packages
+        run: npm i
+      - name: Deploy Phoenix
+        run: npm run deploy
+      - name: Generate API docs
+        run: npm run gen-api-docs
+      
+      ## Commit and push changes to master
+      - name: Commit the newly added files
+        uses: EndBug/add-and-commit@v4
+        with:
+          add: docs
+          message: Deploy to web
+      - name: Push commited changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

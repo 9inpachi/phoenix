@@ -1,0 +1,47 @@
+#
+#   This workflow releases Phoenix by
+#   - building the angular app
+#   - generating the API docs
+#   - pushing the changes to the specified tag
+#
+
+on:
+  push:
+    tags:
+      - v*
+name: Release Phoenix
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      ## Set up
+      - uses: actions/checkout@master
+      - run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Set up node
+        uses: actions/setup-node@v1
+
+      ## Deploy and generate API docs
+      - name: Install required packages
+        run: npm i
+      - name: Deploy Phoenix
+        run: npm run deploy
+      - name: Generate API docs
+        run: npm run gen-api-docs
+      
+      ## Commit and push changes to tag for release
+      - name: Commit the newly added files
+        uses: EndBug/add-and-commit@v4
+        with:
+          message: Release phoenix-${{ env.RELEASE_VERSION }}
+          tag: ${{ env.RELEASE_VERSION }}
+      - name: Push commited changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
