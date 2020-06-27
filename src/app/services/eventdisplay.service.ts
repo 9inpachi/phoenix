@@ -5,6 +5,7 @@ import { UIService } from './ui.service';
 import { Configuration } from './extras/configuration.model';
 import { HttpClient } from '@angular/common/http';
 import { Camera } from 'three';
+import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
 declare global {
   /**
@@ -338,6 +339,23 @@ export class EventdisplayService {
           .subscribe((input: any) => {
             this.parseGLTFGeometry(input);
           });
+      },
+      downloadGLTFasJSON: (gltfUrl: any, filename: string) => {
+        this.http.get(gltfUrl, { responseType: 'text' })
+          .subscribe((input: any) => {
+            const loader = new GLTFLoader();
+            loader.parse(input, '', (gltf: GLTF) => {
+              for (const child of gltf.scene.children) {
+                const blob = new Blob([JSON.stringify(child.toJSON())], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                link.click();
+              }
+            });
+          });
       }
     };
   }
@@ -379,7 +397,7 @@ export class EventdisplayService {
    * @returns uuid of the currently selected object.
    */
   public getActiveObjectId(): any {
-      return this.graphicsLibrary.getActiveObjectId();
+    return this.graphicsLibrary.getActiveObjectId();
   }
 
   /**
