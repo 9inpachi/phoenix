@@ -6,6 +6,7 @@ import { ThreeService } from '../three.service';
 import { Cut } from '../extras/cut.model';
 import { PhoenixObjects } from './objects/phoenix-objects';
 import { InfoLoggerService } from '../infologger.service';
+import { isArray } from 'util';
 
 /**
  * Loader for processing and loading an event.
@@ -259,6 +260,52 @@ export class PhoenixLoader implements EventDataLoader {
     muonScene.name = 'Muon';
     // add to scene
     return muonScene;
+  }
+
+  /**
+   * Convert event data to new JSON data format that uses parameters for defining
+   * types and arrays for collection data.
+   * @param eventData Event data in old JSON format.
+   */
+  public convertToNewFormat(eventData: any) {
+    for (const objectType of Object.keys(eventData)) {
+      if (typeof eventData[objectType] === 'object' && !isArray(objectType)) {
+        // Getting types by using the keys of first collection's first object
+        const firstCollectionKey = Object.keys(eventData[objectType])[0];
+        eventData[objectType]['parameters'] = Object.keys(eventData[objectType][firstCollectionKey][0]);
+
+        // Iterating through each collection
+        for (const collection of Object.keys(eventData[objectType])) {
+          if (collection !== 'parameters') {
+            // Got the collection
+
+            let newCollectionData = [];
+            let objectTypeCollection = eventData[objectType][collection];
+            
+            // Processing each object in the collection and pushing object data to collection array
+            for (const collectionObject of objectTypeCollection) {
+              let singleCollectionObject = [];
+              // Going through each type in order
+              for (const type of eventData[objectType]['parameters']) {
+                singleCollectionObject.push(collectionObject[type]);
+              }
+              newCollectionData.push(singleCollectionObject);
+            }
+
+            // Setting the new array as collection data
+            eventData[objectType][collection] = newCollectionData;
+          }
+        }
+      }
+    }
+    
+    // const link = document.createElement('a');
+    // link.href = URL.createObjectURL(new Blob([JSON.stringify(eventData)]));
+    // link.download = 'newEventData.json';
+    // link.style.display = 'none';
+    // document.body.appendChild(link);
+    // link.click();
+    // link.remove();
   }
 
   /**
