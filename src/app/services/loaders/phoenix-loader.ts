@@ -267,7 +267,7 @@ export class PhoenixLoader implements EventDataLoader {
    * types and arrays for collection data.
    * @param eventData Event data in old JSON format.
    */
-  public convertToNewFormat(eventData: any) {
+  public convertEventDataToNewFormat(eventData: any) {
     for (const objectType of Object.keys(eventData)) {
       if (typeof eventData[objectType] === 'object' && !isArray(objectType)) {
         // Getting types by using the keys of first collection's first object
@@ -306,6 +306,36 @@ export class PhoenixLoader implements EventDataLoader {
     // document.body.appendChild(link);
     // link.click();
     // link.remove();
+  }
+
+  /**
+   * Convert event data to the JSON format Phoenix framework uses.
+   * @param eventData Event data in the new JSON format.
+   * @returns JSON containing event data in Phoenix format.
+   */
+  public static convertEventDataToPhoenixFormat(eventData: any): any {
+    for (const objectType of Object.keys(eventData)) {
+      if (typeof eventData[objectType] === 'object' && !isArray(eventData[objectType])) {
+        for (const collection of Object.keys(eventData[objectType])) {
+          if (collection !== 'parameters') {
+            let newCollectionData = [];
+            for (const collectionObject of eventData[objectType][collection]) {
+              let newCollectionObject = {};
+              if (collectionObject[0]) {
+                newCollectionObject = [];
+              }
+              eventData[objectType]['parameters'].forEach((parameter, index) => {
+                newCollectionObject[parameter] = collectionObject[index];
+              });
+              newCollectionData.push(newCollectionObject);
+            }
+            eventData[objectType][collection] = newCollectionData;
+          }
+        }
+        delete eventData[objectType]['parameters'];
+      }
+    }
+    return eventData;
   }
 
   /**

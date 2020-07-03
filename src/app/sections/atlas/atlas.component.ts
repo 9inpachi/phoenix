@@ -3,6 +3,7 @@ import { EventdisplayService } from '../../services/eventdisplay.service';
 import { Configuration } from '../../services/extras/configuration.model';
 import { PresetView } from '../../services/extras/preset-view.model';
 import { HttpClient } from '@angular/common/http';
+import { PhoenixLoader } from '../../services/loaders/phoenix-loader';
 
 
 @Component({
@@ -25,8 +26,15 @@ export class AtlasComponent implements OnInit {
     ];
 
     this.eventDisplay.init(configuration);
-    this.http.get('assets/files/event_data/atlaseventdump2.json')
-      .subscribe((res: any) => this.eventDisplay.parsePhoenixEvents(res));
+    this.http.get('assets/files/event_data/newEventData.json')
+      .subscribe((res: any) => {
+        let completeEventsData = {};
+        for (const event of Object.keys(res)) {
+          completeEventsData[event] = PhoenixLoader.convertEventDataToPhoenixFormat(res[event]);
+        }
+        console.log(completeEventsData);
+        this.eventDisplay.parsePhoenixEvents(completeEventsData);
+      });
     this.eventDisplay.loadOBJGeometry('assets/geometry/ATLAS/toroids.obj', 'Toroids', 0x8c8c8c, false);
     this.eventDisplay.loadOBJGeometry('assets/geometry/ATLAS/TRT.obj', 'TRT', 0x356aa5, false);
     this.eventDisplay.loadOBJGeometry('assets/geometry/ATLAS/SCT.obj', 'SCT', 0xfff400, false);
