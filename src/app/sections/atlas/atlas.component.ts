@@ -28,12 +28,8 @@ export class AtlasComponent implements OnInit {
     this.eventDisplay.init(configuration);
     this.http.get('assets/files/event_data/newEventData.json')
       .subscribe((res: any) => {
-        let completeEventsData = {};
-        for (const event of Object.keys(res)) {
-          completeEventsData[event] = PhoenixLoader.convertEventDataToPhoenixFormat(res[event]);
-        }
-        console.log(completeEventsData);
-        this.eventDisplay.parsePhoenixEvents(completeEventsData);
+        res = PhoenixLoader.convertEventDataToPhoenixFormat(res);
+        this.eventDisplay.parsePhoenixEvents(res);
       });
     this.eventDisplay.loadOBJGeometry('assets/geometry/ATLAS/toroids.obj', 'Toroids', 0x8c8c8c, false);
     this.eventDisplay.loadOBJGeometry('assets/geometry/ATLAS/TRT.obj', 'TRT', 0x356aa5, false);

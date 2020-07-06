@@ -265,42 +265,46 @@ export class PhoenixLoader implements EventDataLoader {
   /**
    * Convert event data to new JSON data format that uses parameters for defining
    * types and arrays for collection data.
-   * @param eventData Event data in old JSON format.
+   * @param allEventsData Event data in old JSON format.
    */
-  public convertEventDataToNewFormat(eventData: any) {
-    for (const objectType of Object.keys(eventData)) {
-      if (typeof eventData[objectType] === 'object' && !isArray(objectType)) {
-        // Getting types by using the keys of first collection's first object
-        const firstCollectionKey = Object.keys(eventData[objectType])[0];
-        eventData[objectType]['parameters'] = Object.keys(eventData[objectType][firstCollectionKey][0]);
-
-        // Iterating through each collection
-        for (const collection of Object.keys(eventData[objectType])) {
-          if (collection !== 'parameters') {
-            // Got the collection
-
-            let newCollectionData = [];
-            let objectTypeCollection = eventData[objectType][collection];
-            
-            // Processing each object in the collection and pushing object data to collection array
-            for (const collectionObject of objectTypeCollection) {
-              let singleCollectionObject = [];
-              // Going through each type in order
-              for (const type of eventData[objectType]['parameters']) {
-                singleCollectionObject.push(collectionObject[type]);
+  public static convertEventDataToNewFormat(allEventsData: any) {
+    for (const eventDataKey of Object.keys(allEventsData)) {
+      const eventData = allEventsData[eventDataKey];
+      for (const objectType of Object.keys(eventData)) {
+        if (typeof eventData[objectType] === 'object' && !isArray(objectType)) {
+          // Getting types by using the keys of first collection's first object
+          const firstCollectionKey = Object.keys(eventData[objectType])[0];
+          eventData[objectType]['parameters'] = Object.keys(eventData[objectType][firstCollectionKey][0]);
+  
+          // Iterating through each collection
+          for (const collection of Object.keys(eventData[objectType])) {
+            if (collection !== 'parameters') {
+              // Got the collection
+  
+              let newCollectionData = [];
+              let objectTypeCollection = eventData[objectType][collection];
+              
+              // Processing each object in the collection and pushing object data to collection array
+              for (const collectionObject of objectTypeCollection) {
+                let singleCollectionObject = [];
+                // Going through each type in order
+                for (const type of eventData[objectType]['parameters']) {
+                  singleCollectionObject.push(collectionObject[type]);
+                }
+                newCollectionData.push(singleCollectionObject);
               }
-              newCollectionData.push(singleCollectionObject);
+  
+              // Setting the new array as collection data
+              eventData[objectType][collection] = newCollectionData;
             }
-
-            // Setting the new array as collection data
-            eventData[objectType][collection] = newCollectionData;
           }
         }
       }
     }
     
+    // Code for downloading
     // const link = document.createElement('a');
-    // link.href = URL.createObjectURL(new Blob([JSON.stringify(eventData)]));
+    // link.href = URL.createObjectURL(new Blob([JSON.stringify(allEventsData)]));
     // link.download = 'newEventData.json';
     // link.style.display = 'none';
     // document.body.appendChild(link);
@@ -310,32 +314,35 @@ export class PhoenixLoader implements EventDataLoader {
 
   /**
    * Convert event data to the JSON format Phoenix framework uses.
-   * @param eventData Event data in the new JSON format.
+   * @param allEventsData Event data in the new JSON format.
    * @returns JSON containing event data in Phoenix format.
    */
-  public static convertEventDataToPhoenixFormat(eventData: any): any {
-    for (const objectType of Object.keys(eventData)) {
-      if (typeof eventData[objectType] === 'object' && !isArray(eventData[objectType])) {
-        for (const collection of Object.keys(eventData[objectType])) {
-          if (collection !== 'parameters') {
-            let newCollectionData = [];
-            for (const collectionObject of eventData[objectType][collection]) {
-              let newCollectionObject = {};
-              if (collectionObject[0]) {
-                newCollectionObject = [];
+  public static convertEventDataToPhoenixFormat(allEventsData: any): any {
+    for (const eventDataKey of Object.keys(allEventsData)) {
+      const eventData = allEventsData[eventDataKey];
+      for (const objectType of Object.keys(eventData)) {
+        if (typeof eventData[objectType] === 'object' && !isArray(eventData[objectType])) {
+          for (const collection of Object.keys(eventData[objectType])) {
+            if (collection !== 'parameters') {
+              let newCollectionData = [];
+              for (const collectionObject of eventData[objectType][collection]) {
+                let newCollectionObject = {};
+                if (collectionObject[0]) {
+                  newCollectionObject = [];
+                }
+                eventData[objectType]['parameters'].forEach((parameter, index) => {
+                  newCollectionObject[parameter] = collectionObject[index];
+                });
+                newCollectionData.push(newCollectionObject);
               }
-              eventData[objectType]['parameters'].forEach((parameter, index) => {
-                newCollectionObject[parameter] = collectionObject[index];
-              });
-              newCollectionData.push(newCollectionObject);
+              eventData[objectType][collection] = newCollectionData;
             }
-            eventData[objectType][collection] = newCollectionData;
           }
+          delete eventData[objectType]['parameters'];
         }
-        delete eventData[objectType]['parameters'];
       }
     }
-    return eventData;
+    return allEventsData;
   }
 
   /**
