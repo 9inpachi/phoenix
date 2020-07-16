@@ -270,41 +270,42 @@ export class PhoenixLoader implements EventDataLoader {
   public static convertEventDataToNewFormat(allEventsData: any) {
     for (const eventDataKey of Object.keys(allEventsData)) {
       const eventData = allEventsData[eventDataKey];
-      for (const objectType of Object.keys(eventData)) {
-        if (typeof eventData[objectType] === 'object' && !isArray(objectType)) {
-          // Getting types by using the keys of first collection's first object
-          const firstCollectionKey = Object.keys(eventData[objectType])[0];
-          eventData[objectType]['parameters'] = Object.keys(eventData[objectType][firstCollectionKey][0]);
-  
-          // Iterating through each collection
-          for (const collection of Object.keys(eventData[objectType])) {
-            if (collection !== 'parameters') {
+
+      if (eventData) {
+        for (const objectType of Object.keys(eventData)) {
+          if (typeof eventData[objectType] === 'object' && !isArray(objectType)) {
+            // Iterating through each collection
+            for (const collection of Object.keys(eventData[objectType])) {
               // Got the collection
-  
+
               let newCollectionData = [];
               let objectTypeCollection = eventData[objectType][collection];
+              eventData[objectType][collection] = {};
               
+              // Getting types by using the keys of the collection's first object
+              eventData[objectType][collection]['parameters'] = Object.keys(objectTypeCollection[0]);
+
               // Processing each object in the collection and pushing object data to collection array
               for (const collectionObject of objectTypeCollection) {
                 let singleCollectionObject = [];
                 // Going through each type in order
-                for (const type of eventData[objectType]['parameters']) {
+                for (const type of eventData[objectType][collection]['parameters']) {
                   singleCollectionObject.push(collectionObject[type]);
                 }
                 newCollectionData.push(singleCollectionObject);
               }
-  
+
               // Setting the new array as collection data
-              eventData[objectType][collection] = newCollectionData;
+              eventData[objectType][collection]['data'] = newCollectionData;
             }
           }
         }
       }
     }
-    
+
     // Code for downloading
     // const link = document.createElement('a');
-    // link.href = URL.createObjectURL(new Blob([JSON.stringify(allEventsData)]));
+    // link.href = URL.createObjectURL(new Blob([JSON.stringify(allEventsData, null, 2)]));
     // link.download = 'newEventData.json';
     // link.style.display = 'none';
     // document.body.appendChild(link);
@@ -323,22 +324,23 @@ export class PhoenixLoader implements EventDataLoader {
       for (const objectType of Object.keys(eventData)) {
         if (typeof eventData[objectType] === 'object' && !isArray(eventData[objectType])) {
           for (const collection of Object.keys(eventData[objectType])) {
-            if (collection !== 'parameters') {
-              let newCollectionData = [];
-              for (const collectionObject of eventData[objectType][collection]) {
-                let newCollectionObject = {};
-                if (collectionObject[0]) {
-                  newCollectionObject = [];
-                }
-                eventData[objectType]['parameters'].forEach((parameter, index) => {
-                  newCollectionObject[parameter] = collectionObject[index];
-                });
-                newCollectionData.push(newCollectionObject);
+            const collectionParameters = eventData[objectType][collection]['parameters'];
+            
+            let newCollectionData = [];
+            for (const collectionObject of eventData[objectType][collection]['data']) {
+              let newCollectionObject = {};
+
+              // If the collection object is an array (Hits)
+              if (isArray(collectionObject[0])) {
+                newCollectionObject = [];
               }
-              eventData[objectType][collection] = newCollectionData;
+              collectionParameters.forEach((parameter, index) => {
+                newCollectionObject[parameter] = collectionObject[index];
+              });
+              newCollectionData.push(newCollectionObject);
             }
+            eventData[objectType][collection] = newCollectionData;
           }
-          delete eventData[objectType]['parameters'];
         }
       }
     }
