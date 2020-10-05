@@ -2,6 +2,10 @@ import { ThreeManager } from './three/index';
 import { UIManager } from './ui/index';
 import { InfoLogger } from './info-logger';
 
+
+console.log('Some minor change for release testing');
+
+
 /**
  * Event data loader for implementing different event data loaders.
  */
