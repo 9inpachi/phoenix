@@ -6,9 +6,9 @@
     "release": "lerna publish --git-remote upstream --create-release github",
     "release:major": "lerna publish major --git-remote upstream --create-release github",
     "release:minor": "lerna publish major --git-remote upstream --create-release github", 
-    "prerelease": "lerna publish --conventional-prerelease",
+    "prerelease": "lerna publish --conventional-prerelease --force-publish",
     "install:dependencies": "lerna bootstrap",
-    "postpack": "git add ."
+    "version": "git add ."
   },
   "devDependencies": {
     "lerna": "^3.22.1"
