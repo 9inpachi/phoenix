@@ -4,8 +4,11 @@
   "scripts": {
     "start": "lerna run start --parallel",
     "release": "lerna publish --git-remote upstream --create-release github",
+    "release:major": "lerna publish major --git-remote upstream --create-release github",
+    "release:minor": "lerna publish major --git-remote upstream --create-release github", 
     "prerelease": "lerna publish --conventional-prerelease",
-    "install:dependencies": "lerna bootstrap"
+    "install:dependencies": "lerna bootstrap",
+    "postpack": "git add ."
   },
   "devDependencies": {
     "lerna": "^3.22.1"

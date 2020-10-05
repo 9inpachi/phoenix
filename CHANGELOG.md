@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>1.0.2-alpha.2 (2020-10-05)</small>
+
+**Note:** Version bump only for package root
+
+
+
+
+
 ## <small>1.0.2-alpha.1 (2020-10-05)</small>
 
 * Some testing changes in event-data-loader ([54e7a1e](https://github.com/9inpachi/phoenix/commit/54e7a1e))
