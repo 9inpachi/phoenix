@@ -3,6 +3,8 @@ import { UIManager } from './ui/index';
 import { InfoLogger } from './info-logger';
 import { Configuration } from './extras/configuration.model';
 
+console.log('Some minor change for release testing');
+
 declare global {
   /**
    * Window interface for adding objects to the window object.
