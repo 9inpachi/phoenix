@@ -1,6 +1,6 @@
 {
   "name": "phoenix-ng",
-  "version": "0.0.0",
+  "version": "1.0.3-alpha.0",
   "private": true,
   "scripts": {
     "ng": "ng",
@@ -32,7 +32,7 @@
     "coveralls": "^3.1.0",
     "css-element-queries": "^1.2.3",
     "ng5-slider": "^1.2.4",
-    "phoenix-event-display": "^1.0.2",
+    "phoenix-event-display": "^1.0.3-alpha.0",
     "rxjs": "^6.6.2",
     "three": "^0.120.0",
     "tslib": "^2.0.1",
@@ -43,9 +43,9 @@
     "@angular-devkit/build-ng-packagr": "~0.1000.8",
     "@angular/cli": "~10.0.8",
     "@angular/compiler-cli": "~10.0.14",
-    "@types/node": "^12.11.1",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
+    "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~5.0.0",

@@ -143,6 +143,7 @@
 import { UIManager } from &#x27;./ui/index&#x27;;
 import { InfoLogger } from &#x27;./info-logger&#x27;;
 import { Configuration } from &#x27;./extras/configuration.model&#x27;;
+import { StateManager } from &#x27;./managers/state-manager&#x27;;
 
 declare global {
   /**
@@ -182,6 +183,7 @@ export class EventDisplay {
     this.graphicsLibrary &#x3D; new ThreeManager();
     this.infoLogger &#x3D; new InfoLogger();
     this.ui &#x3D; new UIManager(this.graphicsLibrary);
+    new StateManager().setEventDisplay(this);
   }
 
   /**
@@ -189,7 +191,9 @@ export class EventDisplay {
    * @param configuration Configuration used to customize different aspects.
    */
   public init(configuration: Configuration) {
+    // Configuration
     this.configuration &#x3D; configuration;
+    // Init the three manager
     this.graphicsLibrary.init(configuration, this.infoLogger);
     // Showing the UI elements
     this.ui.showUI(configuration);
@@ -378,7 +382,7 @@ export class EventDisplay {
   public loadGLTFGeometry(url: any, name: string,
     scale?: number, initiallyVisible: boolean &#x3D; true) {
     this.graphicsLibrary.loadGLTFGeometry(url, name, scale, initiallyVisible);
-    this.ui.addGeometry(name, 0xff0000, initiallyVisible);
+    this.ui.addGeometry(name, undefined, initiallyVisible);
     this.infoLogger.add(name, &#x27;Loaded GLTF geometry&#x27;);
   }
 
@@ -393,7 +397,7 @@ export class EventDisplay {
   public loadJSONGeometry(json: string | object, name: string,
     scale?: number, doubleSided?: boolean, initiallyVisible: boolean &#x3D; true) {
     this.graphicsLibrary.loadJSONGeometry(json, name, scale, doubleSided, initiallyVisible);
-    this.ui.addGeometry(name, 0xff0000, initiallyVisible);
+    this.ui.addGeometry(name, undefined, initiallyVisible);
     this.infoLogger.add(name, &#x27;Loaded JSON geometry&#x27;);
   }
 
