@@ -14,4 +14,7 @@ services:
 
       build:
         - npm run -C "${TUGBOAT_ROOT}/packages/phoenix-ng" build -- --prod --output-path ${TUGBOAT_ROOT}/tugboat-build --base-href "./" && cp ${TUGBOAT_ROOT}/tugboat-build/index.html ${TUGBOAT_ROOT}/tugboat-build/404.html
-        - ln -snf "${TUGBOAT_ROOT}/tugboat-build" "${DOCROOT}"
+        - mv ${TUGBOAT_ROOT}/tugboat-build /tmp/
+        - rm -rf ${TUGBOAT_ROOT}/*
+        - mv /tmp/tugboat-build/* ${TUGBOAT_ROOT}/
+        - ln -snf "${TUGBOAT_ROOT}" "${DOCROOT}"
